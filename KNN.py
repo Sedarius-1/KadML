@@ -133,7 +133,7 @@ for curr_k in range(1, 16):
         y_hat_test = knn_predict(x_trainsets[i], x_testsets[i], y_train, k_param=curr_k, p_param=2)
         for index in range(len(y_hat_test)):
             modify_error_matrix(y_test.values, y_hat_test, index, error_matrix)
-        print(f"My KNN Accuracy for pair {i} and k = {curr_k}: {accuracy_score(y_test, y_hat_test)}")
+        print(f"Our KNN Accuracy for pair {i} and k = {curr_k}: {accuracy_score(y_test, y_hat_test)}")
         paired_error_matrices[i].append(error_matrix)
         paired_accuracies[i].append([curr_k, accuracy_score(y_test, y_hat_test)])
         clf = KNeighborsClassifier(n_neighbors=curr_k, p=2)
