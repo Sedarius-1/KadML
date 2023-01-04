@@ -159,9 +159,9 @@ for element in accuracies:
     if element[1] >= max_element[1]:
         max_element = element
 
-f = open("output/raport.txt", "w")
+f = open("output/kNN/raport.txt", "w")
 general = f"For General Classification, best accuracy was achieved for k = {max_element[0]}, equal to {max_element[1]},\n " \
-           f" with error matrix:{error_matrices[max_element[0]]}\n"
+           f" with error matrix:{error_matrices[max_element[0]-1]}\n"
 f.write(general)
 print(general)
 
@@ -177,7 +177,7 @@ for index in range(0, 6):
 plt.title("ALL 4 PARAMETERS")
 plt.plot(*zip(*accuracies))
 plt.plot(*zip(*sklearn_acc), color="purple")
-plt.savefig("output/GeneralClassification.png")
+plt.savefig("output/kNN/GeneralClassification.png")
 plt.show()
 
 for index in range(0, 6):
@@ -186,7 +186,7 @@ for index in range(0, 6):
     plt.plot(x, y)
     x_sk, y_sk = zip(*paired_sklearn_acc[index])
     plt.plot(x_sk, y_sk, color="purple")
-    plt.savefig("output/" + pairs[index] + ".png")
+    plt.savefig("output/kNN/" + pairs[index] + ".png")
     plt.show()
 
 f.close()
