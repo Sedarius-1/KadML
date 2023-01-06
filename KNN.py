@@ -84,8 +84,14 @@ for column in data_test.columns:
     data_test[column] = \
         (data_test[column] - data_test[column].min()) / (data_test[column].max() - data_test[column].min())
 
-data_train = data_train.sample(frac=1)
-data_test = data_test.sample(frac=1)
+# for column in data_train.columns:
+#     data_train[column] = np.log(data_train[column])
+#
+# for column in data_test.columns:
+#     data_test[column] = np.log(data_test[column])
+
+# data_train = data_train.sample(frac=1)
+# data_test = data_test.sample(frac=1)
 
 x_train = data_train
 x_test = data_test
@@ -115,14 +121,14 @@ paired_sklearn_acc = [[] for _ in range(0, 6)]
 for curr_k in range(1, 16):
 
     error_matrix = np.zeros(9)
-    y_hat_test = knn_predict(x_train, x_test, y_train, k_param=curr_k, p_param=2)
+    y_hat_test = knn_predict(x_train, x_test, y_train, k_param=curr_k, p_param=5)
     for index in range(len(y_hat_test)):
         modify_error_matrix(y_test.values, y_hat_test, index, error_matrix)
     print(f"My KNN Accuracy for k = {curr_k}: {accuracy_score(y_test, y_hat_test)}")
     accuracies.append([curr_k, accuracy_score(y_test, y_hat_test)])
     error_matrices.append(error_matrix)
 
-    clf = KNeighborsClassifier(n_neighbors=curr_k, p=2)
+    clf = KNeighborsClassifier(n_neighbors=curr_k, p=1)
     clf.fit(x_train, y_train)
     y_pred_test = clf.predict(x_test)
     sklearn_acc.append([curr_k, accuracy_score(y_test, y_pred_test)])

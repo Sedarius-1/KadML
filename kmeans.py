@@ -55,7 +55,7 @@ def wcss(data, data_length, assignments, centroids):
     return wcss_total
 
 
-def kmeans(data, data_length, K, iterations=100, tolerance_level=0.001):
+def kmeans(data, data_length, K, iterations=100, tolerance_level=0.0001):
     current_iteration = -1
     wcss_list = []
     assignments = []
@@ -75,8 +75,9 @@ iris_data = pd.read_csv('data.csv', names=columns)
 
 
 for column in iris_data.columns:
-    iris_data[column] = \
-        (iris_data[column] - iris_data[column].min()) / (iris_data[column].max() - iris_data[column].min())
+    iris_data[column] = (iris_data[column]-np.mean(iris_data[column]))/np.std(iris_data[column])
+    # iris_data[column] = \
+    #     (iris_data[column] - iris_data[column].min()) / (iris_data[column].max() - iris_data[column].min())
 
 values_list = iris_data.drop(columns=['target']).values.tolist()
 
