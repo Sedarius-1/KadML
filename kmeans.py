@@ -35,7 +35,10 @@ def reassign_centroids(data, data_length, assignments, K):
         for n in range(data_length):
             if assignments[n] == i:
                 clustered_points.append(data[n])
-        cluster_mean = np.mean(clustered_points, axis=0)
+        if len(clustered_points)>0:
+            cluster_mean = np.mean(clustered_points, axis=0)
+        else:
+            cluster_mean = np.mean(0)
         reassigned_centroids.append(cluster_mean)
     return reassigned_centroids
 
@@ -52,7 +55,7 @@ def wcss(data, data_length, assignments, centroids):
     return wcss_total
 
 
-def kmeans(data, data_length, K, iterations=100, tolerance_level=0.01):
+def kmeans(data, data_length, K, iterations=100, tolerance_level=0.001):
     current_iteration = -1
     wcss_list = []
     assignments = []
@@ -69,6 +72,11 @@ def kmeans(data, data_length, K, iterations=100, tolerance_level=0.01):
 
 columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'target']
 iris_data = pd.read_csv('data.csv', names=columns)
+
+
+for column in iris_data.columns:
+    iris_data[column] = \
+        (iris_data[column] - iris_data[column].min()) / (iris_data[column].max() - iris_data[column].min())
 
 values_list = iris_data.drop(columns=['target']).values.tolist()
 
@@ -89,11 +97,13 @@ for a1 in range(0,4):
         plt.ylabel(columns[a2])
         plt.savefig("output/kMeans/"+columns[a1]+"-"+columns[a2]+".jpg")
         plt.show()
+        #plt.clf()
 f = open("output/kMeans/raport.txt", "w")
 iteration_list = []
 wcss_list = []
 for k in range (2,11):
     calculated_kmeans = kmeans(values_list, len(values_list), K=k)
+    print(f"WCSS list for k={k}: {calculated_kmeans[2]}")
     wcss_list.append([k,calculated_kmeans[2][-1]])
     iteration_list.append(calculated_kmeans[3])
     f.write(f"Amount of iterations for k={k}:{calculated_kmeans[3]}, WCSS = {calculated_kmeans[2][-1]}\n")
