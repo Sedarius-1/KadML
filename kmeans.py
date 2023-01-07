@@ -7,7 +7,7 @@ import random as rand
 def initialize_centroids(data, data_length, K):
     centroids = []
     for i in range(K):
-        centroid = data[rand.randint(0, data_length-1)]
+        centroid = data[rand.randint(0, data_length - 1)]
         centroids.append(centroid)
     return centroids
 
@@ -35,7 +35,7 @@ def reassign_centroids(data, data_length, assignments, K):
         for n in range(data_length):
             if assignments[n] == i:
                 clustered_points.append(data[n])
-        if len(clustered_points)>0:
+        if len(clustered_points) > 0:
             cluster_mean = np.mean(clustered_points, axis=0)
         else:
             cluster_mean = np.mean(0)
@@ -60,7 +60,9 @@ def kmeans(data, data_length, K, iterations=100, tolerance_level=0.0001):
     wcss_list = []
     assignments = []
     centroids = initialize_centroids(data, data_length, K)
-    while len(wcss_list) <= 1 or (current_iteration < iterations and np.absolute(wcss_list[current_iteration] - wcss_list[current_iteration - 1])/ wcss_list[current_iteration - 1] >= tolerance_level):
+    while len(wcss_list) <= 1 or (current_iteration < iterations and np.absolute(
+            wcss_list[current_iteration] - wcss_list[current_iteration - 1]) / wcss_list[
+                                      current_iteration - 1] >= tolerance_level):
         current_iteration += 1
         assignments = pick_cluster(data, centroids)
         centroids = reassign_centroids(data, data_length, assignments, K)
@@ -73,20 +75,52 @@ def kmeans(data, data_length, K, iterations=100, tolerance_level=0.0001):
 columns = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width', 'target']
 iris_data = pd.read_csv('data.csv', names=columns)
 
-
 for column in iris_data.columns:
-    iris_data[column] = (iris_data[column]-np.mean(iris_data[column]))/np.std(iris_data[column])
-    # iris_data[column] = \
-    #     (iris_data[column] - iris_data[column].min()) / (iris_data[column].max() - iris_data[column].min())
+    iris_data[column] = \
+        (iris_data[column] - iris_data[column].min()) / (iris_data[column].max() - iris_data[column].min())
 
 values_list = iris_data.drop(columns=['target']).values.tolist()
 
+f = open("output/kMeans/raport.txt", "w")
+
+iteration_list = []
+wcss_list = []
+for k in range(2, 11):
+    calculated_kmeans = kmeans(values_list, len(values_list), K=k)
+    print(f"WCSS list for k={k}: {calculated_kmeans[2]}")
+    wcss_list.append([k, calculated_kmeans[2][-1]])
+    iteration_list.append(calculated_kmeans[3])
+    f.write(f"Amount of iterations for k={k}:{calculated_kmeans[3]}, WCSS = {calculated_kmeans[2][-1]}\n")
+
+plt.plot(*zip(*wcss_list))
+plt.savefig("output/kMeans/kMeansElbow.jpg")
+plt.show()
+f.close()
+
 calculated_kmeans = kmeans(values_list, len(values_list), K=3)
 
-for a1 in range(0,4):
-    for a2 in range(a1+1, 4):
+for a1 in range(0, 4):
+    for a2 in range(a1 + 1, 4):
         centroids_x = [calculated_kmeans[1][x][a1] for x in range(len(calculated_kmeans[1]))]
         centroids_y = [calculated_kmeans[1][x][a2] for x in range(len(calculated_kmeans[1]))]
+        x = iris_data[columns[a1]]
+        y = iris_data[columns[a2]]
+        assignments = calculated_kmeans[0]
+        plt.scatter(x, y, c=assignments)
+        plt.plot(centroids_x, centroids_y, c='white', marker='.', linewidth='0.01', markerfacecolor='red',
+                 markersize=24)
+        plt.title("K-means Visualization, 4-dimensional calculation")
+        plt.xlabel(columns[a1])
+        plt.ylabel(columns[a2])
+        plt.savefig("output/kMeans/" + columns[a1] + "-" + columns[a2] + "4-dimensional.jpg")
+        plt.show()
+
+for a1 in range(0, 4):
+    for a2 in range(a1 + 1, 4):
+        values_list = iris_data.iloc[:, [a1, a2]].values.tolist()
+        calculated_kmeans = kmeans(values_list, len(values_list), K=3)
+        centroids_x = [calculated_kmeans[1][x][0] for x in range(len(calculated_kmeans[1]))]
+        centroids_y = [calculated_kmeans[1][x][1] for x in range(len(calculated_kmeans[1]))]
         x = iris_data[columns[a1]]
         y = iris_data[columns[a2]]
         assignments = calculated_kmeans[0]
@@ -96,21 +130,5 @@ for a1 in range(0,4):
         plt.title("K-means Visualization")
         plt.xlabel(columns[a1])
         plt.ylabel(columns[a2])
-        plt.savefig("output/kMeans/"+columns[a1]+"-"+columns[a2]+".jpg")
+        plt.savefig("output/kMeans/" + columns[a1] + "-" + columns[a2] + ".jpg")
         plt.show()
-        #plt.clf()
-f = open("output/kMeans/raport.txt", "w")
-iteration_list = []
-wcss_list = []
-for k in range (2,11):
-    calculated_kmeans = kmeans(values_list, len(values_list), K=k)
-    print(f"WCSS list for k={k}: {calculated_kmeans[2]}")
-    wcss_list.append([k,calculated_kmeans[2][-1]])
-    iteration_list.append(calculated_kmeans[3])
-    f.write(f"Amount of iterations for k={k}:{calculated_kmeans[3]}, WCSS = {calculated_kmeans[2][-1]}\n")
-
-plt.plot(*zip(*wcss_list))
-plt.savefig("output/kMeans/kMeansElbow.jpg")
-plt.show()
-f.close()
-
